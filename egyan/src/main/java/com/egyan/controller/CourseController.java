@@ -1,0 +1,49 @@
+package com.egyan.controller;
+
+import com.egyan.entity.Course;
+import com.egyan.service.CourseService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/courses")
+public class CourseController {
+
+    private final CourseService courseService;
+
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
+    }
+
+    @PostMapping("/{teacherId}")
+    public Course createCourse(@RequestBody Course course,
+                               @PathVariable Long teacherId) {
+
+        return courseService.createCourse(course, teacherId);
+    }
+    @GetMapping
+    public List<Course> getAllCourses() {
+
+        return courseService.getAllCourses();
+    }
+    @PutMapping("/{courseId}/enroll/{studentId}")
+    public Course enrollStudent(@PathVariable Long courseId,
+                                @PathVariable Long studentId) {
+        return courseService.enrollStudent(courseId, studentId);
+    }
+    @GetMapping("/teacher/{teacherId}")
+    public List<Course> getCoursesByTeacher(@PathVariable Long teacherId) {
+        return courseService.getCoursesByTeacher(teacherId);
+    }
+    @GetMapping("/student/{studentId}")
+    public List<Course> getCoursesByStudent(@PathVariable Long studentId) {
+
+        return courseService.getCoursesByStudent(studentId);
+    }
+    @DeleteMapping("/{courseId}/teacher/{teacherId}")
+    public void deleteCourse(@PathVariable Long courseId,
+                             @PathVariable Long teacherId) {
+        courseService.deleteCourse(courseId, teacherId);
+    }
+}
