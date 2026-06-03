@@ -31,29 +31,47 @@ A full-stack online learning platform where **Faculty** can create courses and u
 
 ```
 egyan/
-├── controller/
-│   ├── CourseController.java
-│   ├── CourseMaterialController.java
-│   └── UserController.java
-├── entity/
-│   ├── Course.java
-│   ├── CourseMaterial.java
-│   └── User.java
-├── exception/
-│   ├── EmailAlreadyExistsException.java
-│   └── GlobalExceptionHandler.java
-├── repository/
-│   ├── CourseRepository.java
-│   ├── CourseMaterialRepository.java
-│   └── UserRepository.java
-├── service/
-│   ├── CourseService.java
-│   ├── CourseMaterialService.java
-│   └── UserService.java
-└── EgyanApplication.java
-
-frontend/
-└── index.html
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── egyan/
+│   │   │           ├── config/
+│   │   │           │   ├── CorsConfig.java
+│   │   │           │   └── SecurityConfig.java
+│   │   │           ├── controller/
+│   │   │           │   ├── CourseController.java
+│   │   │           │   ├── CourseMaterialController.java
+│   │   │           │   ├── UserController.java
+│   │   │           │   └── WebController.java        ← new (add this)
+│   │   │           ├── entity/
+│   │   │           │   ├── Course.java
+│   │   │           │   ├── CourseMaterial.java
+│   │   │           │   └── User.java
+│   │   │           ├── exception/
+│   │   │           │   ├── EmailAlreadyExistsException.java
+│   │   │           │   └── GlobalExceptionHandler.java
+│   │   │           ├── repository/
+│   │   │           │   ├── CourseRepository.java
+│   │   │           │   ├── CourseMaterialRepository.java
+│   │   │           │   └── UserRepository.java
+│   │   │           ├── service/
+│   │   │           │   ├── CourseService.java
+│   │   │           │   ├── CourseMaterialService.java
+│   │   │           │   └── UserService.java
+│   │   │           └── EgyanApplication.java
+│   │   └── resources/
+│   │       ├── static/
+│   │       │   ├── index.html                        ← landing page
+│   │       │   └── egyan.html                        ← login + platform
+│   │       └── application.properties
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── egyan/
+│                   └── EgyanApplicationTests.java
+├── pom.xml
+└── .gitignore
 ```
 
 ---
