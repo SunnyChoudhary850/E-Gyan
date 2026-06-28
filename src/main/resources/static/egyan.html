@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EGyan — Learning Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #080a10;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #0f1524 0%, #05070a 100%);
+            --surface: rgba(18, 22, 32, 0.55);
+            --surface-hover: rgba(28, 34, 48, 0.75);
+            --surface-solid: #121620;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(61, 153, 112, 0.35);
+            --border-focus: rgba(61, 153, 112, 0.6);
+            --text: #f0f4f8;
+            --muted: #8b96a4;
+            --accent: #2d6a4f;
+            --accent-bright: #3d9970;
+            --accent-glow: rgba(45, 106, 79, 0.25);
+            --gold: #d4a843;
+            --gold-dim: rgba(212, 168, 67, 0.1);
+            --gold-border: rgba(212, 168, 67, 0.25);
+            --danger: #ff6b6b;
+            --danger-bg: rgba(255, 107, 107, 0.1);
+            --danger-border: rgba(255, 107, 107, 0.25);
+            --radius-lg: 20px;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            background-image: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        /* ── BACKGROUND GLOW EFFECT ── */
+        .bg-glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(140px);
+            opacity: 0.08;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+        .bg-glow-1 { background: var(--accent-bright); top: -10%; left: -10%; }
+        .bg-glow-2 { background: var(--gold); bottom: -10%; right: -10%; animation-delay: -7s; }
+        .bg-glow-3 { background: #4facfe; top: 40%; left: 50%; width: 350px; height: 350px; animation-delay: -12s; }
+        
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(80px, 50px) scale(1.1); }
+            100% { transform: translate(-50px, -70px) scale(0.95); }
+        }
+
+        /* ── UTILITIES & SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        /* ── LAYOUT ── */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* ── SIDEBAR ── */
+        aside.sidebar {
+            width: var(--sidebar-width);
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            font-weight: 600;
+        }
+        .logo span { color: var(--accent-bright); }
+
+        .sidebar-user {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, #1b4332 100%);
+            border: 2px solid var(--accent-bright);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text);
+            box-shadow: 0 0 15px rgba(61, 153, 112, 0.2);
+        }
+
+        .sidebar-user-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-username {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar-userrole {
+            font-size: 11px;
+            margin-top: 2px;
+            width: fit-content;
+        }
+
+        .sidebar-menu {
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .menu-item {
+            background: none;
+            border: none;
+            color: var(--muted);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .menu-item svg {
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+
+        .menu-item:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .menu-item.active {
+            color: #fff;
+            background: var(--accent-glow);
+            box-shadow: inset 3px 0 0 var(--accent-bright);
+        }
+        .menu-item.active svg {
+            color: var(--accent-bright);
+            opacity: 1;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        .main-header {
+            height: 70px;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8, 10, 16, 0.5);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .header-title-area h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .content-body {
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        /* ── AUTH PAGES (UNAUTHENTICATED) ── */
+        .auth-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
+                        0 0 50px rgba(61, 153, 112, 0.05);
+            animation: cardEntrance 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .auth-logo span { color: var(--accent-bright); }
+
+        .auth-subtitle {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            margin-bottom: 2rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted);
+            transition: var(--transition);
+        }
+
+        .auth-tab:hover { color: var(--text); }
+        .auth-tab.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ── FORMS & INPUTS ── */
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            color: var(--muted);
+            transition: var(--transition);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.15);
+            color: var(--text);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--border-focus);
+            background: rgba(0, 0, 0, 0.25);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: var(--accent-bright);
+            box-shadow: 0 6px 16px rgba(61, 153, 112, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent-bright);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .btn-danger {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger);
+        }
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-icon:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .btn-icon.btn-danger-icon:hover {
+            color: var(--danger);
+            background: var(--danger-bg);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .badge-faculty { background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); }
+        .badge-student { background: var(--accent-glow); border: 1px solid var(--border-hover); color: var(--accent-bright); }
+        .badge-admin { background: rgba(147, 51, 234, 0.15); border: 1px solid rgba(147, 51, 234, 0.3); color: #c084fc; }
+
+        /* ── PAGES ── */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── COURSE GRID & CARDS ── */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .course-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            border: 1px solid transparent;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+            background: var(--surface-hover);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(61, 153, 112, 0.05);
+        }
+
+        .course-card:hover::after {
+            border-color: var(--border-hover);
+        }
+
+        .course-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #fff;
+        }
+
+        .course-card p {
+            font-size: 13.5px;
+            color: var(--muted);
+            line-height: 1.6;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .course-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .course-card-teacher {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .course-card-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        /* ── MODALS (GLASSMORPHIC OVERLAYS) ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 5, 8, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--surface-solid);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.2rem;
+            width: min(480px, 100%);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+
+        .modal-overlay.open .modal {
+            transform: scale(1);
+        }
+
+        .modal h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: #fff;
+        }
+
+        /* Detail Modal Specifics */
+        .modal-detail-layout {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-detail-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+        }
+
+        /* ── UPLOAD ZONE ── */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent-bright);
+            background: rgba(61, 153, 112, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .upload-link {
+            color: var(--accent-bright);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        .upload-subtext {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* ── MATERIALS LIST ── */
+        .material-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .material-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--border-hover);
+        }
+
+        .material-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .material-type-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .material-details {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .material-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #fff;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .material-meta {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .material-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── PROFILE CARD ── */
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            max-width: 520px;
+            margin-top: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-card-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, #1b4332 100%);
+            border: 3px solid var(--accent-bright);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 25px rgba(61, 153, 112, 0.25);
+        }
+
+        .profile-details {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .profile-row:last-child { border-bottom: none; }
+        .profile-label { font-weight: 500; color: var(--muted); }
+        .profile-val { font-weight: 600; color: #fff; }
+
+        /* ── TOAST ALERTS ── */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 360px;
+            width: calc(100% - 48px);
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background: var(--surface-solid);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 13.5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: toastIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            position: relative;
+        }
+
+        @keyframes toastIn {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes toastOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(50px); opacity: 0; }
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--accent-bright);
+            background: rgba(18, 22, 32, 0.95);
+        }
+        .toast-error {
+            border-left: 4px solid var(--danger);
+            background: rgba(18, 22, 32, 0.95);
+        }
+        .toast-info {
+            border-left: 4px solid #4facfe;
+            background: rgba(18, 22, 32, 0.95);
+        }
+
+        .toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+        .toast-message { flex: 1; line-height: 1.4; }
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 0 2px;
+            transition: var(--transition);
+        }
+        .toast-close:hover { color: #fff; }
+
+        /* ── INLINE ALERTS (FORM ERRORS) ── */
+        .alert {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 1.25rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert.show { display: flex; }
+        .alert-error {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger);
+        }
+        .alert-success {
+            background: var(--accent-glow);
+            border: 1px solid var(--border-hover);
+            color: var(--accent-bright);
+        }
+
+        /* ── EMPTY STATES ── */
+        .empty {
+            text-align: center;
+            padding: 4rem 1.5rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .empty-icon {
+            font-size: 2.8rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* ── LOADING ANIMATIONS ── */
+        .spin {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── RESPONSIVE RESPONSIVENESS ── */
+        @media (max-width: 900px) {
+            aside.sidebar {
+                transform: translateX(-100%);
+            }
+            aside.sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND EFFECTS -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- AUTH PAGE (UNAUTHENTICATED) -->
+    <div class="auth-container" id="page-auth">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">E<span>Gyan</span></div>
+                <p class="auth-subtitle">Your personalized LMS learning environment</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="btn-tab-login" onclick="switchAuthTab('login')">Log in</button>
+                <button class="auth-tab" id="btn-tab-register" onclick="switchAuthTab('register')">Register</button>
+            </div>
+            
+            <div id="alert-auth" class="alert"></div>
+
+            <!-- Login Form -->
+            <div id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="name@egyan.edu" required/>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required/>
+                </div>
+                <button class="btn btn-primary" style="width:100%; margin-top: 1rem;" onclick="handleLogin()">
+                    <span id="login-btn-text">Log in to Portal</span>
+                </button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" style="display:none">
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" placeholder="Prof. Jane Doe / John Smith" required/>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" placeholder="name@egyan.edu" required/>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" placeholder="Minimum 6 characters" required/>
+                </div>
+                <div class="form-group">
+                    <label for="reg-role">Account Type</label>
+                    <select id="reg-role" required>
+                        <option value="">Select your role</option>
+                        <option value="STUDENT">Student</option>
+                        <option value="FACULTY">Faculty Member</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" style="width:100%; margin-top:1rem;" onclick="handleSendOtp()">
+                    <span id="reg-btn-text">Send OTP</span>
+                </button>
+
+                <div id="otp-section" style="display:none; margin-top:1.25rem;">
+                    <div class="form-group">
+                        <label for="reg-otp">Enter OTP sent to your email</label>
+                        <input type="text" id="reg-otp" placeholder="6 digit code" maxlength="6"/>
+                    </div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="handleVerifyAndRegister()">
+                        <span id="otp-btn-text">Verify & Create Account</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER (AUTHENTICATED) -->
+    <div class="app-container" id="app-container" style="display:none">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="app-sidebar">
+            <div class="sidebar-brand">
+                <a href="/" class="logo">E<span>Gyan</span></a>
+            </div>
+            
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebar-avatar">?</div>
+                <div class="sidebar-user-info">
+                    <span id="sidebar-username" class="sidebar-username">Loading...</span>
+                    <span id="sidebar-userrole" class="badge sidebar-userrole">STUDENT</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="menu-item active" id="menu-courses" onclick="showPage('courses')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                    All Courses
+                </button>
+                <button class="menu-item" id="menu-my-courses" onclick="showPage('my-courses')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    My Courses
+                </button>
+                <button class="menu-item" id="menu-profile" onclick="showPage('profile')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    My Profile
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-outline" style="width:100%; border-color: rgba(255,255,255,0.08);" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Log out
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- HEADER -->
+            <header class="main-header">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <div class="header-title-area">
+                    <h1 id="page-title">All Courses</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="create-course-btn" style="display:none" onclick="openCreateModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        New Course
+                    </button>
+                    <a href="/" class="btn btn-outline" style="font-size: 13px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        Exit to Home
+                    </a>
+                </div>
+            </header>
+
+            <!-- MAIN CONTENT WRAPPER -->
+            <div class="content-body">
+                
+                <!-- ALL COURSES PAGE -->
+                <div class="page active" id="page-courses">
+                    <div class="course-grid" id="courses-grid">
+                        <div class="empty"><span class="empty-icon">📚</span>Loading courses database...</div>
+                    </div>
+                </div>
+
+                <!-- MY COURSES PAGE -->
+                <div class="page" id="page-my-courses">
+                    <div class="course-grid" id="my-courses-grid">
+                        <div class="empty"><span class="empty-icon">📂</span>Loading enrolled catalog...</div>
+                    </div>
+                </div>
+
+                <!-- PROFILE PAGE -->
+                <div class="page" id="page-profile">
+                    <div class="profile-card" id="profile-card">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ── MODALS ── -->
+
+    <!-- CREATE COURSE MODAL -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal">
+            <h3>Create New Course</h3>
+            <div id="alert-create" class="alert"></div>
+            <div class="form-group">
+                <label for="course-title">Course Title</label>
+                <input type="text" id="course-title" placeholder="e.g. Introduction to Astrophysics" required/>
+            </div>
+            <div class="form-group">
+                <label for="course-desc">Course Syllabus/Description</label>
+                <textarea id="course-desc" placeholder="Provide a brief outline of the course structure, learning outcomes, and expected prerequisites." required></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="create-course-submit" onclick="handleCreateCourse()">Create Course</button>
+                <button class="btn btn-outline" onclick="closeCreateModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENROLL MODAL -->
+    <div class="modal-overlay" id="enroll-modal">
+        <div class="modal">
+            <h3 id="enroll-modal-title">Enroll in Course</h3>
+            <p style="font-size:13.5px; color:var(--muted); margin-bottom:1.5rem; line-height: 1.6;">
+                By enrolling in this course, you will be registered as an active student. You will be able to access all documents, videos, and study materials uploaded by the faculty.
+            </p>
+            <div id="alert-enroll" class="alert"></div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="handleEnroll()">Confirm Registration</button>
+                <button class="btn btn-outline" onclick="closeEnrollModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COURSE DETAIL MODAL (SPACIOUS OVERLAY) -->
+    <div class="modal-overlay" id="detail-modal">
+        <div class="modal" style="width: min(840px, 95vw); max-height: 90vh; overflow-y: auto;">
+            
+            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <div>
+                    <h3 id="detail-title" style="margin-bottom:4px; font-size: 1.5rem;"></h3>
+                    <div id="detail-teacher" style="font-size:13px; color: var(--muted);"></div>
+                </div>
+                <button class="btn-icon" onclick="closeDetailModal()" style="font-size:1.4rem;">✕</button>
+            </div>
+
+            <!-- INLINE VIDEO PLAYER PREVIEW CONTAINER -->
+            <div id="video-player-container" style="display:none; margin-bottom:1.5rem; background:#000; border-radius:var(--radius); overflow:hidden; position:relative; border: 1px solid var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 15px; background:rgba(0,0,0,0.85); position:absolute; top:0; left:0; right:0; z-index:10; color:#fff;">
+                    <span id="video-player-title" style="font-size:12px; font-weight:600; opacity: 0.95;">Playing Video</span>
+                    <button onclick="closeVideoPlayer()" style="background:none; border:none; color:#fff; font-size:1rem; cursor:pointer;">✕ Close Player</button>
+                </div>
+                <video id="video-player" controls style="width:100%; display:block; aspect-ratio:16/9;"></video>
+            </div>
+
+            <!-- DETAIL SPLIT LAYOUT -->
+            <div class="modal-detail-layout">
+                
+                <!-- Left Column: Course Overview and Materials -->
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border);">
+                        <p id="detail-desc" style="font-size:14px; color:var(--muted); line-height:1.7; flex:1;"></p>
+                        <button id="edit-course-btn" onclick="toggleDescEdit()" style="font-size:11px; display:none; margin-left:12px; flex-shrink:0;" class="btn btn-outline btn-sm">✏️ Edit</button>
+                    </div>
+                    <div id="desc-edit-area" style="display:none; margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border);">
+                        <textarea id="desc-edit-input" style="width:100%; margin-bottom:8px;"></textarea>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-primary btn-sm" onclick="saveDescEdit()">Save</button>
+                            <button class="btn btn-outline btn-sm" onclick="cancelDescEdit()">Cancel</button>
+                        </div>
+                    </div>
+                    <h4 style="font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Syllabus & Materials
+                    </h4>
+                    
+                    <div id="detail-materials">
+                        <div class="empty" style="padding:2rem;">
+                            <span class="empty-icon" style="font-size:2rem">📭</span>
+                            No materials uploaded for this course yet.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Upload Management & Students -->
+                <div style="border-left: 1px solid var(--border); padding-left: 1.5rem;" id="detail-management-col">
+                    
+                    <!-- UPLOAD SECTION -->
+                    <div id="detail-upload-section" style="display:none; margin-bottom: 1.5rem;">
+                        <h4 style="font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:1rem;">Upload Learning Material</h4>
+                        <div id="alert-detail-upload" class="alert"></div>
+                        
+                        <div class="form-group">
+                            <label for="detail-material-title">Resource Title</label>
+                            <input type="text" id="detail-material-title" placeholder="e.g. Chapter 1 PDF notes"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="detail-material-type">Content Type</label>
+                            <select id="detail-material-type">
+                                <option value="DOCUMENT">📄 PDF / Slide / Document</option>
+                                <option value="VIDEO">🎬 MP4 / Streaming Video</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>File Attachment</label>
+                            <!-- Drag and Drop upload block -->
+                            <div class="upload-zone" id="upload-zone">
+                                <div class="upload-zone-content">
+                                    <div class="upload-icon">📁</div>
+                                    <p class="upload-text">Drag & drop file or <span class="upload-link">browse</span></p>
+                                    <span class="upload-subtext">Max 500MB (PDF, DOCX, MP4, PPTX)</span>
+                                </div>
+                                <input type="file" id="detail-material-file" accept="video/*,.pdf,.doc,.docx,.ppt,.pptx" style="display:none"/>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width:100%" onclick="handleDetailUpload()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Start Upload
+                        </button>
+                    </div>
+
+                    <!-- STUDENTS LIST SECTION -->
+                    <div id="detail-students-section" style="display:none; margin-bottom: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                        <h4 style="font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.75rem;">Enrolled Students</h4>
+                        <div id="detail-students" style="max-height: 200px; overflow-y: auto; padding-right: 4px;"></div>
+                    </div>
+
+                    <!-- DELETE COURSE SECTION -->
+                    <div id="detail-delete-section" style="display:none; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                        <button class="btn btn-danger" style="width:100%" onclick="handleDeleteCourse()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                            Delete this Course
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        const BASE = 'http://localhost:8080';
+        let currentUser = null;
+        let enrollTargetId = null;
+        let detailCourseId = null;
+
+        // Custom Toast Notifications
+        function showToast(msg, type = 'error') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <span class="toast-message">${msg}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // Inline Form Alerts
+        function showAlert(id, msg, type = 'error') {
+            const el = document.getElementById(id);
+            if (el) {
+                el.className = `alert alert-${type} show`;
+                el.innerHTML = `<span>${type === 'success' ? '✓' : '⚠'}</span> ${msg}`;
+                if (type === 'success') {
+                    setTimeout(() => el.classList.remove('show'), 4000);
+                }
+            } else {
+                showToast(msg, type);
+            }
+        }
+
+        function hideAlert(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('show');
+        }
+
+        // API Client
+        async function api(method, path, body) {
+            const opts = { 
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: body ? JSON.stringify(body) : undefined
+            };
+            if (body) opts.body = JSON.stringify(body);
+            
+            try {
+                const res = await fetch(BASE + path, opts);
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.message || data.error || `HTTP error ${res.status}`);
+                }
+                const ct = res.headers.get('content-type') || '';
+                return ct.includes('json') ? res.json() : null;
+            } catch (err) {
+                console.error("API error:", err);
+                throw err;
+            }
+        }
+
+        // Helper Layout Formatters
+        function roleBadge(role) {
+            const r = (role || '').toUpperCase();
+            const cls = r === 'FACULTY' ? 'faculty' : r === 'ADMIN' ? 'admin' : 'student';
+            return `<span class="badge badge-${cls}">${r}</span>`;
+        }
+
+        function initials(name) { 
+            return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(); 
+        }
+
+        function escape(s) { 
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); 
+        }
+
+        function formatSize(bytes) {
+            if (!bytes) return 'Unknown size';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Sidebar Responsiveness Toggle
+        function toggleDescEdit() {
+            const desc = document.getElementById('detail-desc');
+            const area = document.getElementById('desc-edit-area');
+            const input = document.getElementById('desc-edit-input');
+            desc.style.display = 'none';
+            input.value = desc.textContent;
+            area.style.display = 'block';
+        }
+
+        function cancelDescEdit() {
+            document.getElementById('detail-desc').style.display = 'block';
+            document.getElementById('desc-edit-area').style.display = 'none';
+        }
+
+        async function saveDescEdit() {
+            const description = document.getElementById('desc-edit-input').value.trim();
+            if (!description) return;
+            try {
+                await api('PUT', `/courses/${detailCourseId}/teacher/${currentUser.id}/update`, { description });
+                document.getElementById('detail-desc').textContent = description;
+                cancelDescEdit();
+                showToast('Description updated!', 'success');
+            } catch (e) {
+                showToast('Failed to update: ' + e.message, 'error');
+            }
+        }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar) sidebar.classList.toggle('open');
+        }
+
+        // Drag and Drop Upload Handlers
+        function initUploadZone() {
+            const zone = document.getElementById('upload-zone');
+            const fileInput = document.getElementById('detail-material-file');
+            if (!zone || !fileInput) return;
+
+            // Remove existing listeners by replacing element (avoid duplicate registers)
+            const newZone = zone.cloneNode(true);
+            zone.parentNode.replaceChild(newZone, zone);
+            const newFileInput = newZone.querySelector('input[type="file"]');
+
+            newZone.addEventListener('click', () => newFileInput.click());
+            
+            newZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                newZone.classList.add('dragover');
+            });
+            
+            newZone.addEventListener('dragleave', () => newZone.classList.remove('dragover'));
+            
+            newZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                newZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    newFileInput.files = e.dataTransfer.files;
+                    updateUploadLabel(newFileInput.files[0]);
+                }
+            });
+            
+            newFileInput.addEventListener('change', () => {
+                if (newFileInput.files.length) {
+                    updateUploadLabel(newFileInput.files[0]);
+                }
+            });
+        }
+
+        function updateUploadLabel(file) {
+            const textEl = document.querySelector('.upload-text');
+            if (textEl && file) {
+                textEl.innerHTML = `Selected: <strong>${escape(file.name)}</strong>`;
+                
+                // Smart auto-detect fileType
+                const ext = file.name.split('.').pop().toLowerCase();
+                const typeSelect = document.getElementById('detail-material-type');
+                if (typeSelect) {
+                    if (['mp4', 'mkv', 'webm', 'mov', 'avi'].includes(ext)) {
+                        typeSelect.value = 'VIDEO';
+                    } else {
+                        typeSelect.value = 'DOCUMENT';
+                    }
+                }
+            }
+        }
+
+        // Auth Tabs Toggle
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            if (tab === 'login') {
+                document.getElementById('btn-tab-login').classList.add('active');
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('register-form').style.display = 'none';
+            } else {
+                document.getElementById('btn-tab-register').classList.add('active');
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+            }
+            hideAlert('alert-auth');
+        }
+
+        // Login Handler
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            if (!email || !password) { 
+                showAlert('alert-auth', 'Please input both email and password.'); 
+                return; 
+            }
+            const btnText = document.getElementById('login-btn-text');
+            btnText.innerHTML = '<span class="spin"></span> Authenticating...';
+            try {
+                const user = await api('POST', '/users/login', { email, password });
+                localStorage.setItem('egyanUser', JSON.stringify(user));
+
+                if (user.role === 'ADMIN') {
+                    window.location.href = '/admin';
+                } else {
+                    setUser(user);
+                    showToast('Welcome back, ' + user.name + '!', 'success');
+                }
+            } catch (e) { 
+                showAlert('alert-auth', e.message || 'Authentication failed. Please verify credentials.'); 
+            }
+            btnText.textContent = 'Log in to Portal';
+        }
+
+        // Register Handler
+        async function handleSendOtp() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const role = document.getElementById('reg-role').value;
+
+            if (!name || !email || !password || !role) { showAlert('alert-auth', 'All registration details are required.'); return; }
+            if (password.length < 6) { showAlert('alert-auth', 'Password must be at least 6 characters long.'); return; }
+
+            const btnText = document.getElementById('reg-btn-text');
+            btnText.innerHTML = '<span class="spin"></span> Sending OTP...';
+
+            try {
+                await api('POST', '/users/send-otp', { email });
+                document.getElementById('otp-section').style.display = 'block';
+                showAlert('alert-auth', 'OTP sent to ' + email + '. Please check your inbox.', 'success');
+            } catch (e) {
+                showAlert('alert-auth', 'Failed to send OTP: ' + e.message);
+            }
+
+            btnText.textContent = 'Send OTP';
+        }
+
+        async function handleVerifyAndRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const role = document.getElementById('reg-role').value;
+            const otp = document.getElementById('reg-otp').value.trim();
+
+            if (!otp) { showAlert('alert-auth', 'Please enter the OTP.'); return; }
+
+            const btnText = document.getElementById('otp-btn-text');
+            btnText.innerHTML = '<span class="spin"></span> Verifying...';
+
+            try {
+                const verified = await api('POST', '/users/verify-otp', { email, otp });
+                if (!verified) { showAlert('alert-auth', 'Invalid or expired OTP.'); btnText.textContent = 'Verify & Create Account'; return; }
+
+                // OTP verified, now create account
+                await api('POST', '/users', { name, email, password, role });
+                showToast('Registration successful! Please log in.', 'success');
+                switchAuthTab('login');
+                document.getElementById('login-email').value = email;
+                document.getElementById('otp-section').style.display = 'none';
+            } catch (e) {
+                showAlert('alert-auth', e.message || 'Registration failed.');
+            }
+
+            btnText.textContent = 'Verify & Create Account';
+        }
+        /*async function handleRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const role = document.getElementById('reg-role').value;
+            
+            if (!name || !email || !password || !role) { 
+                showAlert('alert-auth', 'All registration details are required.'); 
+                return; 
+            }
+            if (password.length < 6) {
+                showAlert('alert-auth', 'Password must be at least 6 characters long.');
+                return;
+            }
+            
+            const btnText = document.getElementById('reg-btn-text');
+            btnText.innerHTML = '<span class="spin"></span> Creating Profile...';
+            try {
+                await api('POST', '/users', { name, email, password, role });
+                showToast('Registration successful! Please log in.', 'success');
+                switchAuthTab('login');
+                document.getElementById('login-email').value = email;
+            } catch (e) {
+                const msg = e.message.includes('409') || e.message.toLowerCase().includes('conflict')
+                    ? 'This email address is already registered.'
+                    : (e.message || 'Registration failed.');
+                showAlert('alert-auth', msg);
+            }
+            btnText.textContent = 'Create Account';
+        }
+         */
+
+        // User Context Management
+        function setUser(user) {
+            currentUser = user;
+            document.getElementById('page-auth').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+            
+            // Sync Sidebar
+            document.getElementById('sidebar-username').textContent = user.name;
+            document.getElementById('sidebar-avatar').textContent = initials(user.name);
+            const roleEl = document.getElementById('sidebar-userrole');
+            roleEl.textContent = user.role;
+            roleEl.className = `badge sidebar-userrole badge-${user.role.toLowerCase()}`;
+            
+            // Faculty course permissions
+            if (user.role === 'FACULTY') {
+                document.getElementById('create-course-btn').style.display = 'inline-flex';
+            } else {
+                document.getElementById('create-course-btn').style.display = 'none';
+            }
+            
+            buildProfile();
+            showPage('courses');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('egyanUser');
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('page-auth').style.display = 'flex';
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+            showToast('You have been logged out.', 'info');
+        }
+
+        // Tab Navigation
+        function showPage(name) {
+            // Mobile sidebar auto-close
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar) sidebar.classList.remove('open');
+
+            document.querySelectorAll('.menu-item').forEach(btn => btn.classList.remove('active'));
+            
+            const btnMap = { courses: 'menu-courses', 'my-courses': 'menu-my-courses', profile: 'menu-profile' };
+            document.getElementById(btnMap[name])?.classList.add('active');
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + name)?.classList.add('active');
+            
+            // Update title
+            const titles = { courses: 'All Courses', 'my-courses': currentUser?.role === 'FACULTY' ? 'Courses I Teach' : "Courses I'm Enrolled In", profile: 'My Profile' };
+            document.getElementById('page-title').textContent = titles[name];
+            
+            if (name === 'courses') loadCourses();
+            if (name === 'my-courses') loadMyCourses();
+        }
+
+        // Load Course DB
+        async function loadCourses() {
+            const grid = document.getElementById('courses-grid');
+            grid.innerHTML = '<div class="empty"><span class="empty-icon">📚</span>Loading courses...</div>';
+            try {
+                const courses = await api('GET', '/courses');
+                if (!courses.length) { 
+                    grid.innerHTML = '<div class="empty"><span class="empty-icon">📭</span>No courses available yet.</div>'; 
+                    return; 
+                }
+                grid.innerHTML = courses.map((c, index) => courseCardHTML(c, false, index)).join('');
+            } catch (e) { 
+                showToast('Failed to load courses: ' + e.message, 'error'); 
+            }
+        }
+
+        // Load Personal Courses
+        async function loadMyCourses() {
+            const grid = document.getElementById('my-courses-grid');
+            grid.innerHTML = '<div class="empty"><span class="empty-icon">📂</span>Loading your workspace...</div>';
+            try {
+                let courses = [];
+                if (currentUser.role === 'FACULTY') {
+                    courses = await api('GET', `/courses/teacher/${currentUser.id}`);
+                } else {
+                    courses = await api('GET', `/courses/student/${currentUser.id}`);
+                }
+                if (!courses.length) { 
+                    grid.innerHTML = `<div class="empty"><span class="empty-icon">📂</span>You haven't ${currentUser.role === 'FACULTY' ? 'created' : 'enrolled in'} any courses yet.</div>`; 
+                    return; 
+                }
+                grid.innerHTML = courses.map((c, index) => courseCardHTML(c, currentUser.role === 'STUDENT', index)).join('');
+            } catch (e) { 
+                showToast('Failed to load your courses: ' + e.message, 'error'); 
+            }
+        }
+
+        // Render Course Cards
+        function courseCardHTML(c, enrolled = false, index = 0) {
+            const teacherName = c.teacher ? c.teacher.name : 'Unknown';
+            const studentCount = c.students ? c.students.length : 0;
+            const isEnrolled = enrolled || (c.students && c.students.some(s => s.id === currentUser?.id));
+            const canEnroll = currentUser?.role === 'STUDENT' && !isEnrolled;
+            const isTeacher = currentUser?.role === 'FACULTY' && c.teacher?.id === currentUser?.id;
+            
+            // Stagger animation delays for premium loading
+            const animationDelay = `animation-delay: ${index * 0.05}s`;
+
+            return `
+                <div class="course-card" style="animation: fadeIn 0.4s ease both; ${animationDelay}">
+                    <h3>${escape(c.title)}</h3>
+                    <p>${escape(c.description || 'No syllabus description provided.')}</p>
+                    <div class="course-card-meta">
+                        <span class="course-card-teacher">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            ${escape(teacherName)}
+                        </span>
+                        <span>${studentCount} Enrolled Student${studentCount !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="course-card-actions">
+                        <button class="btn btn-outline btn-sm" onclick="openDetailModal(${c.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            View Materials
+                        </button>
+                        ${canEnroll ? `
+                            <button class="btn btn-primary btn-sm" onclick="openEnrollModal(${c.id}, '${escape(c.title)}')">
+                                Enroll Now
+                            </button>
+                        ` : ''}
+                        ${isEnrolled ? `
+                            <span style="font-size: 12px; color: var(--accent-bright); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; padding-left: 8px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Enrolled
+                            </span>
+                        ` : ''}
+                        ${isTeacher ? `
+                            <button class="btn btn-outline btn-sm" style="border-color: var(--accent-bright); color: var(--accent-bright);" onclick="openDetailModal(${c.id})">
+                                Manage
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Details Modal Manager
+        async function openDetailModal(courseId) {
+            detailCourseId = courseId;
+            const modalOverlay = document.getElementById('detail-modal');
+            modalOverlay.classList.add('open');
+            
+            document.getElementById('detail-title').textContent = 'Fetching course metadata...';
+            document.getElementById('detail-desc').textContent = '';
+            document.getElementById('detail-teacher').innerHTML = '';
+            document.getElementById('detail-materials').innerHTML = '<div class="empty"><span class="spin"></span> Loading resources...</div>';
+            document.getElementById('detail-students').innerHTML = '';
+            document.getElementById('detail-students-section').style.display = 'none';
+            document.getElementById('detail-delete-section').style.display = 'none';
+            document.getElementById('detail-upload-section').style.display = 'none';
+            document.getElementById('detail-management-col').style.display = 'none';
+            document.getElementById('detail-desc').style.display = 'block';
+            document.getElementById('desc-edit-area').style.display = 'none';
+
+            closeVideoPlayer();
+            hideAlert('alert-detail-upload');
+
+            try {
+                const courses = await api('GET', '/courses');
+                const course = courses.find(c => c.id === courseId);
+                
+                if (course) {
+                    document.getElementById('detail-title').textContent = course.title;
+                    document.getElementById('detail-desc').textContent = course.description || 'No detailed syllabus text available.';
+                    document.getElementById('detail-teacher').innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Lecturer: <strong>${escape(course.teacher?.name || 'Unknown')}</strong>
+                    `;
+                    
+                    const isTeacher = currentUser?.role === 'FACULTY' && course.teacher?.id === currentUser?.id;
+                    if (isTeacher) {
+                        document.getElementById('detail-management-col').style.display = 'block';
+                        document.getElementById('detail-upload-section').style.display = 'block';
+                        document.getElementById('detail-students-section').style.display = 'block';
+                        document.getElementById('detail-delete-section').style.display = 'block';
+                        document.getElementById('edit-course-btn').style.display = 'inline-flex';
+                        
+                        initUploadZone();
+                        
+                        const students = course.students || [];
+                        document.getElementById('detail-students').innerHTML = students.length
+                            ? students.map(s => `
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+                                    <span style="font-size:12.5px; font-weight:500;">👤 ${escape(s.name)}</span>
+                                    <span style="font-size:11px; color:var(--muted);">${escape(s.email)}</span>
+                                </div>
+                              `).join('')
+                            : '<p style="font-size:12px; color:var(--muted); text-align:center; padding: 1rem 0;">No students enrolled in this course.</p>';
+                    }
+                }
+
+                const materials = await api('GET', `/materials/${courseId}`);
+                const isTeacherOfCourse = course && currentUser?.role === 'FACULTY' && course.teacher?.id === currentUser?.id;
+                
+                if (!materials || !materials.length) {
+                    document.getElementById('detail-materials').innerHTML = `
+                        <div class="empty" style="padding:2rem;">
+                            <span class="empty-icon" style="font-size:2rem">📭</span>
+                            No materials uploaded for this course yet.
+                        </div>`;
+                } else {
+                    document.getElementById('detail-materials').innerHTML = materials.map(m => {
+                        const isVideo = m.fileType === 'VIDEO';
+                        return `
+                            <div class="material-item">
+                                <div class="material-info">
+                                    <span class="material-type-icon">${isVideo ? '🎬' : '📄'}</span>
+                                    <div class="material-details">
+                                        <span class="material-title" title="${escape(m.title)}">${escape(m.title)}</span>
+                                        <span class="material-meta">${escape(m.fileName)} · ${formatSize(m.fileSize)}</span>
+                                    </div>
+                                </div>
+                                <div class="material-actions">
+                                    ${isVideo ? `
+                                        <button class="btn btn-outline btn-sm" style="padding: 4px 8px; font-size:11px;" onclick="playVideo(${m.id}, '${escape(m.title)}')">
+                                            ▶ Stream
+                                        </button>
+                                    ` : ''}
+                                    <a href="${BASE}/materials/download/${m.id}" class="btn btn-primary btn-sm" style="padding: 4px 8px; font-size:11px;">
+                                        ⬇ Get File
+                                    </a>
+                                    ${isTeacherOfCourse ? `
+                                        <button class="btn-icon btn-danger-icon" onclick="deleteMaterial(${m.id}, event)" title="Delete Resource">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                document.getElementById('detail-materials').innerHTML = `
+                    <p style="font-size:13px; color:var(--danger); padding:1rem; text-align:center;">
+                        Failed to retrieve resources: ${e.message}
+                    </p>`;
+            }
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.remove('open');
+            document.getElementById('edit-course-btn').style.display = 'none';
+            document.getElementById('detail-desc').style.display = 'block';
+            document.getElementById('desc-edit-area').style.display = 'none';
+            detailCourseId = null;
+            closeVideoPlayer();
+        }
+
+        // Video Player Logic
+        function playVideo(materialId, title) {
+            const container = document.getElementById('video-player-container');
+            const player = document.getElementById('video-player');
+            const titleEl = document.getElementById('video-player-title');
+            
+            if (!container || !player) return;
+            
+            titleEl.innerHTML = `🎬 Now Playing: <strong>${escape(title)}</strong>`;
+            player.src = `${BASE}/materials/download/${materialId}`;
+            container.style.display = 'block';
+            player.play().catch(err => console.warn('Autoplay prevented:', err));
+            
+            // Scroll modal to show player
+            document.getElementById('detail-modal').querySelector('.modal').scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function closeVideoPlayer() {
+            const container = document.getElementById('video-player-container');
+            const player = document.getElementById('video-player');
+            if (player) {
+                player.pause();
+                player.removeAttribute('src');
+                player.load();
+            }
+            if (container) container.style.display = 'none';
+        }
+
+        // Material Delete
+        async function deleteMaterial(materialId, event) {
+            if (event) event.stopPropagation();
+            if (!confirm('Are you sure you want to delete this resource permanently?')) return;
+            
+            try {
+                await api('DELETE', `/materials/${materialId}`);
+                showToast('Material resource deleted successfully.', 'success');
+                // Reload modal content
+                await openDetailModal(detailCourseId);
+            } catch (e) {
+                showToast('Failed to delete material: ' + e.message, 'error');
+            }
+        }
+
+        // Upload Material Handler
+        async function handleDetailUpload() {
+            const title = document.getElementById('detail-material-title').value.trim();
+            const fileType = document.getElementById('detail-material-type').value;
+            const fileInput = document.querySelector('#upload-zone input[type="file"]');
+            const file = fileInput ? fileInput.files[0] : null;
+
+            if (!title) { showAlert('alert-detail-upload', 'Title cannot be blank.'); return; }
+            if (!file) { showAlert('alert-detail-upload', 'Please select or drop a file to upload.'); return; }
+            if (!detailCourseId) { showToast('Upload target missing', 'error'); return; }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', title);
+            formData.append('fileType', fileType);
+
+            showAlert('alert-detail-upload', 'Uploading file, please wait...', 'success');
+
+            try {
+                const res = await fetch(`${BASE}/materials/${detailCourseId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text || 'Upload failed due to server error');
+                }
+
+                showToast('Resource uploaded successfully!', 'success');
+
+                document.getElementById('detail-material-title').value = '';
+                if (fileInput) fileInput.value = '';
+                const textEl = document.querySelector('#upload-zone .upload-text');
+                if (textEl) textEl.innerHTML = 'Drag & drop file or <span class="upload-link">browse</span>';
+
+                await openDetailModal(detailCourseId);
+            } catch (e) {
+                showAlert('alert-detail-upload', 'Upload failed: ' + e.message, 'error');
+            }
+        }
+
+        // Delete Course
+        async function handleDeleteCourse() {
+            if (!confirm('Warning: Deleting this course will permanently erase all materials, enrollments, and syllabus notes. Continue?')) return;
+            try {
+                await api('DELETE', `/courses/${detailCourseId}/teacher/${currentUser.id}`);
+                closeDetailModal();
+                showPage('courses');
+                showToast('Course has been deleted.', 'success');
+            } catch (e) { 
+                showToast('Failed to delete course: ' + e.message, 'error'); 
+            }
+        }
+
+        // Create Course Modal Managers
+        function openCreateModal() {
+            document.getElementById('create-modal').classList.add('open'); 
+        }
+        
+        function closeCreateModal() {
+            document.getElementById('create-modal').classList.remove('open');
+            document.getElementById('course-title').value = '';
+            document.getElementById('course-desc').value = '';
+            hideAlert('alert-create');
+        }
+
+        async function handleCreateCourse() {
+            const title = document.getElementById('course-title').value.trim();
+            const description = document.getElementById('course-desc').value.trim();
+            
+            if (!title) { showAlert('alert-create', 'Course title is required.'); return; }
+            try {
+                await api('POST', `/courses/${currentUser.id}`, { title, description });
+                closeCreateModal();
+                showPage('courses');
+                showToast('Course created! Open course details to upload syllabus materials.', 'success');
+            } catch (e) { 
+                showAlert('alert-create', 'Failed to create course: ' + e.message); 
+            }
+        }
+
+        // Enroll Managers
+        function openEnrollModal(courseId, title) {
+            enrollTargetId = courseId;
+            document.getElementById('enroll-modal-title').textContent = 'Enroll in: ' + title;
+            document.getElementById('enroll-modal').classList.add('open');
+        }
+
+        function closeEnrollModal() {
+            enrollTargetId = null;
+            document.getElementById('enroll-modal').classList.remove('open');
+            hideAlert('alert-enroll');
+        }
+
+        async function handleEnroll() {
+            try {
+                await api('PUT', `/courses/${enrollTargetId}/enroll/${currentUser.id}`);
+                closeEnrollModal();
+                showPage('courses');
+                showToast('Congratulations! You are now enrolled in the course.', 'success');
+            } catch (e) { 
+                showAlert('alert-enroll', 'Enrollment failed: ' + e.message); 
+            }
+        }
+
+        // Profile Builder
+        function buildProfile() {
+            const u = currentUser;
+            if (!u) return;
+            document.getElementById('profile-card').innerHTML = `
+                <div class="profile-card-avatar">${initials(u.name)}</div>
+                <h3 style="font-family:'Outfit',sans-serif; font-size:1.5rem; font-weight:600; margin-bottom:1.5rem;">${escape(u.name)}</h3>
+                <div class="profile-details">
+                    <div class="profile-row"><span class="profile-label">Full Name</span><span class="profile-val">${escape(u.name)}</span></div>
+                    <div class="profile-row"><span class="profile-label">Email Address</span><span class="profile-val">${escape(u.email)}</span></div>
+                    <div class="profile-row"><span class="profile-label">System Role</span><span class="profile-val">${roleBadge(u.role)}</span></div>
+                    <div class="profile-row"><span class="profile-label">User ID</span><span class="profile-val" style="color:var(--muted); font-family: monospace;">#${u.id}</span></div>
+                </div>
+            `;
+        }
+
+        // Modal dismissal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(el => {
+            el.addEventListener('click', e => { 
+                if (e.target === el) {
+                    el.classList.remove('open');
+                    if (el.id === 'detail-modal') {
+                        detailCourseId = null;
+                        closeVideoPlayer();
+                    }
+                } 
+            });
+        });
+        (function restoreSession() {
+            try {
+                const saved = localStorage.getItem('egyanUser');
+                if (saved) {
+                    const user = JSON.parse(saved);
+                    if (user && user.id && user.role) {
+                        if (user.role === 'ADMIN') {
+                            window.location.href = '/admin';
+                        } else {
+                            setUser(user);
+                        }
+                    }
+                }
+            } catch (e) {
+                localStorage.removeItem('egyanUser');
+            }
+        })();
+    </script>
+</body>
+</html>
