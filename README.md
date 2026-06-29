@@ -181,18 +181,25 @@ Automated HTML-formatted emails are triggered for the following events:
 > Landing Page · Student Portal · Faculty Dashboard · Admin Panel
 ## 📸 Screenshots
 
-### Landing Page
-![Landing Page](images/landing.png)
+### Home Page
+![Home Page](images/home_page.png)
+
+### Login & Registration
+![Login](images/login.png)
+![Registration](images/registration.png)
 
 ### Student Portal
-![Student Portal](images/student.png)
+![Student Portal](images/Student_portal.png)
+![Enroll in Course](images/Student_enroll_in_course.jpeg)
+![Student Registered](images/Student_registered.jpeg)
 
 ### Faculty Dashboard
-![Faculty Dashboard](images/faculty.png)
+![Faculty](images/Faculty.png)
+![Course Created](images/Course_created.jpeg)
+![Material Upload](images/material_upload.png)
 
-### Admin Panel
-![Admin Panel](images/admin.png)
-
+### Admin Dashboard
+![Admin Dashboard](images/Admin_dashboard.png)
 ---
 
 ## 👨‍💻 Author
