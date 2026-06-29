@@ -1,5 +1,5 @@
-EGyan — Institute of Excellence 🎓
-A full-stack Learning Management System (LMS) built with Spring Boot and vanilla JavaScript, connecting passionate educators with curious students.
+#EGyan — Institute of Excellence 🎓
+A full-stack Learning Management System built with Spring Boot and vanilla, connecting passionate educators with curious students.
 ![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen?style=flat-square&logo=springboot)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=flat-square&logo=mysql)
@@ -24,11 +24,11 @@ Send platform-wide notifications
 ---
 🛠️ Tech Stack
 Layer	Technology
-Backend	Java 17, Spring Boot 3.5
+Backend	Java, Spring Boot
 Security	Spring Security, BCrypt
-Database	MySQL 8.0, Spring Data JPA
+Database	MySQL, Spring Data JPA
 Email	JavaMailSender, Gmail SMTP
-Frontend	HTML5, CSS3, Vanilla JavaScript
+Frontend	HTML5, CSS, Vanilla JavaScript
 Build Tool	Maven
 ---
 📁 Project Structure
@@ -51,9 +51,9 @@ egyan/
 ---
 ⚙️ Setup & Installation
 Prerequisites
-Java 17+
-MySQL 8.0+
-Maven 3.8+
+Java
+MySQL
+Maven
 Gmail account with App Password enabled
 1. Clone the repository
 ```bash
@@ -137,6 +137,5 @@ Er. Sunny Choudhary
 📍 Gorakhpur, UP, India
 ---
 📄 License
-This project is open source and available under the MIT License.
+This project is open source and available.
 ---
-<p align="center">Built with ❤️ by Er. Sunny Choudhary</p>
